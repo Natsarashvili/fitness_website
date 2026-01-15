@@ -1,7 +1,4 @@
 <?php
-/**
- * ადმინ პანელი - ინსტრუქტორების მართვა
- */
 
 require_once '../config/database.php';
 require_once '../includes/functions.php';
@@ -10,7 +7,6 @@ require_admin();
 
 $page_title = 'ინსტრუქტორების მართვა';
 
-// წაშლა
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     
@@ -27,7 +23,6 @@ if (isset($_GET['delete'])) {
     redirect('instructors.php');
 }
 
-// დამატება/რედაქტირება
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
     $name = clean($_POST['name']);

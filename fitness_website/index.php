@@ -1,20 +1,10 @@
 <?php
-/**
- * მთავარი გვერდი
- * 
- * აქ ნაჩვენებია:
- * - მისალმება
- * - პოპულარული ვარჯიშები
- * - კატეგორიები
- * - სტატისტიკა
- */
-
 require_once 'config/database.php';
 require_once 'includes/functions.php';
 
 $page_title = 'მთავარი';
 
-// ვიღებთ პოპულარულ ვარჯიშებს (ბოლო 6)
+
 $workouts_sql = "
     SELECT w.*, c.name as category_name, i.name as instructor_name,
            COALESCE(AVG(r.rating), 0) as avg_rating,
@@ -29,11 +19,11 @@ $workouts_sql = "
 ";
 $workouts_result = mysqli_query($conn, $workouts_sql);
 
-// ვიღებთ კატეგორიებს
+
 $categories_sql = "SELECT * FROM categories LIMIT 5";
 $categories_result = mysqli_query($conn, $categories_sql);
 
-// სტატისტიკა
+
 $stats_sql = "
     SELECT 
         (SELECT COUNT(*) FROM workouts) as total_workouts,
@@ -47,7 +37,7 @@ $stats = mysqli_fetch_assoc($stats_result);
 include 'includes/header.php';
 ?>
 
-<!-- Hero Section - მთავარი ბანერი -->
+
 <section class="hero">
     <div class="hero-content">
         <h1>💪 მოგესალმებით FitLife-ზე!</h1>
@@ -69,7 +59,7 @@ include 'includes/header.php';
     </div>
 </section>
 
-<!-- სტატისტიკა -->
+
 <section class="stats-section">
     <div class="stats-grid">
         <div class="stat-card">
@@ -98,7 +88,7 @@ include 'includes/header.php';
     </div>
 </section>
 
-<!-- კატეგორიები -->
+
 <section class="categories-section">
     <h2 class="text-center">კატეგორიები</h2>
     <div class="categories-grid">
@@ -106,7 +96,7 @@ include 'includes/header.php';
             <a href="workouts.php?category=<?php echo $category['id']; ?>" class="category-card card">
                 <div class="category-icon">
                     <?php
-                    // იქონები კატეგორიებისთვის
+
                     $icons = [
                         'კარდიო' => '🏃',
                         'ძალოვნი' => '💪',
@@ -124,7 +114,7 @@ include 'includes/header.php';
     </div>
 </section>
 
-<!-- პოპულარული ვარჯიშები -->
+
 <section class="workouts-section">
     <h2 class="text-center">უახლესი ვარჯიშები</h2>
     
@@ -133,7 +123,7 @@ include 'includes/header.php';
             <?php while ($workout = mysqli_fetch_assoc($workouts_result)): ?>
                 <div class="card workout-card">
                     
-                    <!-- სურათი -->
+
                     <?php if ($workout['image']): ?>
                         <img 
                             src="uploads/workouts/<?php echo htmlspecialchars($workout['image']); ?>" 
@@ -146,7 +136,6 @@ include 'includes/header.php';
                         </div>
                     <?php endif; ?>
                     
-                    <!-- ინფორმაცია -->
                     <div class="workout-info">
                         <h3><?php echo htmlspecialchars($workout['title']); ?></h3>
                         
@@ -154,7 +143,6 @@ include 'includes/header.php';
                             <?php echo htmlspecialchars(substr($workout['description'], 0, 100)) . '...'; ?>
                         </p>
                         
-                        <!-- დეტალები -->
                         <div class="workout-meta">
                             <span class="badge badge-<?php echo $workout['difficulty_level']; ?>">
                                 <?php echo get_difficulty_label($workout['difficulty_level']); ?>
@@ -182,7 +170,6 @@ include 'includes/header.php';
                             </p>
                         <?php endif; ?>
                         
-                        <!-- ღილაკი -->
                         <a href="workout_detail.php?id=<?php echo $workout['id']; ?>" class="btn-primary" style="margin-top: 1rem; width: 100%; text-align: center;">
                             დეტალურად
                         </a>
@@ -203,7 +190,7 @@ include 'includes/header.php';
 </section>
 
 <style>
-    /* Hero Section */
+
     .hero {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
@@ -232,7 +219,7 @@ include 'includes/header.php';
         flex-wrap: wrap;
     }
     
-    /* სტატისტიკა */
+
     .stats-section {
         margin: 3rem 0;
     }
@@ -268,7 +255,7 @@ include 'includes/header.php';
         font-size: 0.9rem;
     }
     
-    /* კატეგორიები */
+
     .categories-section {
         margin: 3rem 0;
     }
@@ -306,7 +293,6 @@ include 'includes/header.php';
         font-size: 0.9rem;
     }
     
-    /* ვარჯიშის ბარათი */
     .workouts-section {
         margin: 3rem 0;
     }

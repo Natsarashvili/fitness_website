@@ -1,7 +1,5 @@
 <?php
-/**
- * ადმინ პანელი - კატეგორიების მართვა
- */
+
 
 require_once '../config/database.php';
 require_once '../includes/functions.php';
@@ -10,7 +8,6 @@ require_admin();
 
 $page_title = 'კატეგორიების მართვა';
 
-// წაშლა
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     mysqli_query($conn, "DELETE FROM categories WHERE id = $id");
@@ -18,7 +15,6 @@ if (isset($_GET['delete'])) {
     redirect('categories.php');
 }
 
-// დამატება/რედაქტირება
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
     $name = clean($_POST['name']);

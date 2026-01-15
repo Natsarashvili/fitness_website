@@ -1,29 +1,18 @@
 <?php
-/**
- * პროფილის გვერდი
- * 
- * აქ მომხმარებელი ხედავს:
- * - პირად ინფორმაციას
- * - დასრულებულ ვარჯიშებს
- * - პროგრესს
- * - სტატისტიკას
- */
+
 
 require_once 'config/database.php';
 require_once 'includes/functions.php';
 
-// მხოლოდ ავტორიზებული მომხმარებლებისთვის
 require_login();
 
 $page_title = 'ჩემი პროფილი';
 $user_id = $_SESSION['user_id'];
 
-// მომხმარებლის ინფორმაცია
 $user_sql = "SELECT * FROM users WHERE id = $user_id";
 $user_result = mysqli_query($conn, $user_sql);
 $user = mysqli_fetch_assoc($user_result);
 
-// სტატისტიკა
 $stats_sql = "
     SELECT 
         COUNT(DISTINCT up.workout_id) as completed_workouts,
@@ -37,7 +26,6 @@ $stats_sql = "
 $stats_result = mysqli_query($conn, $stats_sql);
 $stats = mysqli_fetch_assoc($stats_result);
 
-// დასრულებული ვარჯიშები
 $progress_sql = "
     SELECT up.*, w.title, w.image, w.difficulty_level, w.duration
     FROM user_progress up
@@ -48,7 +36,6 @@ $progress_sql = "
 ";
 $progress_result = mysqli_query($conn, $progress_sql);
 
-// ბოლო შეფასებები
 $reviews_sql = "
     SELECT r.*, w.title as workout_title
     FROM reviews r
@@ -64,7 +51,6 @@ include 'includes/header.php';
 
 <div class="profile-page">
     
-    <!-- პროფილის Header -->
     <div class="profile-header card">
         <div class="profile-avatar">
             <div class="avatar-circle">
@@ -87,7 +73,6 @@ include 'includes/header.php';
         </div>
     </div>
     
-    <!-- სტატისტიკა -->
     <div class="stats-grid">
         <div class="stat-card card">
             <div class="stat-icon">✅</div>
@@ -108,10 +93,8 @@ include 'includes/header.php';
         </div>
     </div>
     
-    <!-- ორი სვეტი -->
     <div class="profile-content">
         
-        <!-- მარცხენა სვეტი - დასრულებული ვარჯიშები -->
         <div class="profile-section">
             <div class="card">
                 <h2>📋 დასრულებული ვარჯიშები</h2>
@@ -160,7 +143,6 @@ include 'includes/header.php';
             </div>
         </div>
         
-        <!-- მარჯვენა სვეტი - შეფასებები -->
         <div class="profile-section">
             <div class="card">
                 <h2>⭐ ჩემი შეფასებები</h2>
@@ -205,12 +187,10 @@ include 'includes/header.php';
         
     </div>
     
-    <!-- პროგრესის დიაგრამა (დამატებითი ფუნქციონალი) -->
     <div class="card">
         <h2>📈 აქტივობა ბოლო 7 დღეში</h2>
         
         <?php
-        // ბოლო 7 დღის აქტივობა
         $activity_sql = "
             SELECT DATE(completed_date) as date, COUNT(*) as count
             FROM user_progress
@@ -221,14 +201,12 @@ include 'includes/header.php';
         ";
         $activity_result = mysqli_query($conn, $activity_sql);
         
-        // შევქმნათ მასივი ბოლო 7 დღისთვის
         $days = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = date('Y-m-d', strtotime("-$i days"));
             $days[$date] = 0;
         }
         
-        // შევავსოთ რეალური მონაცემებით
         while ($activity = mysqli_fetch_assoc($activity_result)) {
             $days[$activity['date']] = $activity['count'];
         }
@@ -256,7 +234,6 @@ include 'includes/header.php';
         margin: 0 auto;
     }
     
-    /* Profile Header */
     .profile-header {
         display: flex;
         gap: 2rem;
@@ -281,7 +258,6 @@ include 'includes/header.php';
         margin-bottom: 0.5rem;
     }
     
-    /* სტატისტიკა */
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -311,7 +287,6 @@ include 'includes/header.php';
         font-size: 0.9rem;
     }
     
-    /* კონტენტი */
     .profile-content {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -319,7 +294,6 @@ include 'includes/header.php';
         margin-bottom: 2rem;
     }
     
-    /* დასრულებული ვარჯიშები */
     .progress-list {
         display: flex;
         flex-direction: column;
@@ -379,7 +353,6 @@ include 'includes/header.php';
         color: #6B7280;
     }
     
-    /* შეფასებები */
     .reviews-list {
         display: flex;
         flex-direction: column;
@@ -422,14 +395,12 @@ include 'includes/header.php';
         margin-top: 0.5rem;
     }
     
-    /* Empty State */
     .empty-state {
         text-align: center;
         padding: 3rem 2rem;
         color: #6B7280;
     }
     
-    /* აქტივობის დიაგრამა */
     .activity-chart {
         display: flex;
         justify-content: space-around;

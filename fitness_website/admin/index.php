@@ -1,19 +1,13 @@
 <?php
-/**
- * ადმინის მთავარი გვერდი (Dashboard)
- * 
- * სტატისტიკა და სწრაფი წვდომა
- */
+
 
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 
-// მხოლოდ ადმინებისთვის
 require_admin();
 
 $page_title = 'ადმინ პანელი';
 
-// სტატისტიკა
 $stats_sql = "
     SELECT 
         (SELECT COUNT(*) FROM workouts) as total_workouts,
@@ -27,11 +21,9 @@ $stats_sql = "
 $stats_result = mysqli_query($conn, $stats_sql);
 $stats = mysqli_fetch_assoc($stats_result);
 
-// უახლესი ვარჯიშები
 $recent_workouts_sql = "SELECT * FROM workouts ORDER BY created_at DESC LIMIT 5";
 $recent_workouts = mysqli_query($conn, $recent_workouts_sql);
 
-// უახლესი მომხმარებლები
 $recent_users_sql = "SELECT * FROM users ORDER BY created_at DESC LIMIT 5";
 $recent_users = mysqli_query($conn, $recent_users_sql);
 
@@ -45,7 +37,6 @@ include 'admin_header.php';
         <p style="color: #6B7280;">სისტემის მართვა და კონტროლი</p>
     </div>
     
-    <!-- სტატისტიკის ბარათები -->
     <div class="stats-grid">
         <div class="stat-card card">
             <div class="stat-icon">💪</div>
@@ -89,10 +80,8 @@ include 'admin_header.php';
         </div>
     </div>
     
-    <!-- ორი სვეტი -->
     <div class="admin-content">
         
-        <!-- უახლესი ვარჯიშები -->
         <div class="card">
             <h2>უახლესი ვარჯიშები</h2>
             <table class="table">
@@ -123,7 +112,6 @@ include 'admin_header.php';
             </table>
         </div>
         
-        <!-- უახლესი მომხმარებლები -->
         <div class="card">
             <h2>უახლესი მომხმარებლები</h2>
             <table class="table">
@@ -156,7 +144,6 @@ include 'admin_header.php';
         
     </div>
     
-    <!-- სწრაფი ქმედებები -->
     <div class="quick-actions card">
         <h2>სწრაფი ქმედებები</h2>
         <div class="quick-actions-grid">

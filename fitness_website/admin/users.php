@@ -1,7 +1,5 @@
 <?php
-/**
- * ადმინ პანელი - მომხმარებლების მართვა
- */
+
 
 require_once '../config/database.php';
 require_once '../includes/functions.php';
@@ -10,11 +8,9 @@ require_admin();
 
 $page_title = 'მომხმარებლების მართვა';
 
-// წაშლა
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     
-    // არ შეიძლება საკუთარი თავის წაშლა
     if ($id == $_SESSION['user_id']) {
         show_message('საკუთარი თავი ვერ წაშლით', 'error');
         redirect('users.php');
@@ -25,7 +21,6 @@ if (isset($_GET['delete'])) {
     redirect('users.php');
 }
 
-// როლის შეცვლა
 if (isset($_GET['toggle_role'])) {
     $id = (int)$_GET['toggle_role'];
     

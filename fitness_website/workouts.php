@@ -1,21 +1,15 @@
 <?php
-/**
- * ვარჯიშების გვერდი
- * 
- * ყველა ვარჯიში + ფილტრაცია + ძებნა
- */
+
 
 require_once 'config/database.php';
 require_once 'includes/functions.php';
 
 $page_title = 'ვარჯიშები';
 
-// ფილტრაციის პარამეტრები
 $category_filter = isset($_GET['category']) ? (int)$_GET['category'] : 0;
 $difficulty_filter = isset($_GET['difficulty']) ? clean($_GET['difficulty']) : '';
 $search_query = isset($_GET['search']) ? clean($_GET['search']) : '';
 
-// SQL query-ს აგება (დინამიურად)
 $sql = "
     SELECT w.*, c.name as category_name, i.name as instructor_name,
            COALESCE(AVG(r.rating), 0) as avg_rating,
@@ -27,7 +21,6 @@ $sql = "
     WHERE 1=1
 ";
 
-// ფილტრების დამატება
 if ($category_filter > 0) {
     $sql .= " AND w.category_id = " . $category_filter;
 }
@@ -45,7 +38,6 @@ $sql .= " GROUP BY w.id ORDER BY w.created_at DESC";
 
 $workouts_result = mysqli_query($conn, $sql);
 
-// კატეგორიების ჩამოტვირთვა (ფილტრისთვის)
 $categories_sql = "SELECT * FROM categories ORDER BY name";
 $categories_result = mysqli_query($conn, $categories_sql);
 
@@ -54,11 +46,9 @@ include 'includes/header.php';
 
 <h1>ყველა ვარჯიში</h1>
 
-<!-- ძებნა და ფილტრაცია -->
 <div class="filters-section card">
     <form method="GET" action="workouts.php" class="filters-form">
         
-        <!-- ძებნა -->
         <div class="filter-group">
             <label for="search">🔍 ძებნა</label>
             <input 
@@ -71,7 +61,6 @@ include 'includes/header.php';
             >
         </div>
         
-        <!-- კატეგორია -->
         <div class="filter-group">
             <label for="category">📁 კატეგორია</label>
             <select id="category" name="category" class="form-control">
@@ -87,7 +76,6 @@ include 'includes/header.php';
             </select>
         </div>
         
-        <!-- სირთულე -->
         <div class="filter-group">
             <label for="difficulty">📊 სირთულე</label>
             <select id="difficulty" name="difficulty" class="form-control">
@@ -104,7 +92,6 @@ include 'includes/header.php';
             </select>
         </div>
         
-        <!-- ღილაკები -->
         <div class="filter-buttons">
             <button type="submit" class="btn-primary">ძებნა</button>
             <a href="workouts.php" class="btn-secondary">გასუფთავება</a>
@@ -112,7 +99,6 @@ include 'includes/header.php';
     </form>
 </div>
 
-<!-- შედეგები -->
 <div class="results-info">
     <p>
         ნაპოვნია: <strong><?php echo mysqli_num_rows($workouts_result); ?></strong> ვარჯიში
@@ -125,13 +111,11 @@ include 'includes/header.php';
     </p>
 </div>
 
-<!-- ვარჯიშების ბადე -->
 <?php if (mysqli_num_rows($workouts_result) > 0): ?>
     <div class="card-grid">
         <?php while ($workout = mysqli_fetch_assoc($workouts_result)): ?>
             <div class="card workout-card">
                 
-                <!-- სურათი -->
                 <?php if ($workout['image']): ?>
                     <img 
                         src="uploads/workouts/<?php echo htmlspecialchars($workout['image']); ?>" 
@@ -144,7 +128,6 @@ include 'includes/header.php';
                     </div>
                 <?php endif; ?>
                 
-                <!-- ინფორმაცია -->
                 <div class="workout-info">
                     <h3><?php echo htmlspecialchars($workout['title']); ?></h3>
                     
@@ -152,7 +135,6 @@ include 'includes/header.php';
                         <?php echo htmlspecialchars(substr($workout['description'], 0, 120)) . '...'; ?>
                     </p>
                     
-                    <!-- მეტა ინფორმაცია -->
                     <div class="workout-meta">
                         <span class="badge badge-<?php echo $workout['difficulty_level']; ?>">
                             <?php echo get_difficulty_label($workout['difficulty_level']); ?>
@@ -168,7 +150,6 @@ include 'includes/header.php';
                         <?php endif; ?>
                     </div>
                     
-                    <!-- კატეგორია და ინსტრუქტორი -->
                     <?php if ($workout['category_name']): ?>
                         <p style="margin-top: 0.5rem; color: #6B7280; font-size: 0.9rem;">
                             📁 <?php echo htmlspecialchars($workout['category_name']); ?>
@@ -181,7 +162,6 @@ include 'includes/header.php';
                         </p>
                     <?php endif; ?>
                     
-                    <!-- ღილაკი -->
                     <a href="workout_detail.php?id=<?php echo $workout['id']; ?>" class="btn-primary" style="margin-top: 1rem; width: 100%; text-align: center;">
                         დეტალურად
                     </a>
@@ -197,7 +177,6 @@ include 'includes/header.php';
 <?php endif; ?>
 
 <style>
-    /* ფილტრები */
     .filters-section {
         margin-bottom: 2rem;
     }
@@ -225,7 +204,6 @@ include 'includes/header.php';
         flex: 1;
     }
     
-    /* შედეგები */
     .results-info {
         margin-bottom: 1.5rem;
         padding: 1rem;
@@ -237,7 +215,6 @@ include 'includes/header.php';
         margin: 0;
     }
     
-    /* ვარჯიშის ბარათი */
     .workout-card {
         display: flex;
         flex-direction: column;

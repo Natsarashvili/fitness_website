@@ -1,7 +1,4 @@
 <?php
-/**
- * ადმინ პანელი - სავარჯიშოების მართვა
- */
 
 require_once '../config/database.php';
 require_once '../includes/functions.php';
@@ -10,7 +7,6 @@ require_admin();
 
 $page_title = 'სავარჯიშოების მართვა';
 
-// წაშლა
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     mysqli_query($conn, "DELETE FROM exercises WHERE id = $id");
@@ -18,7 +14,6 @@ if (isset($_GET['delete'])) {
     redirect('exercises.php');
 }
 
-// დამატება/რედაქტირება
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
     $workout_id = (int)$_POST['workout_id'];

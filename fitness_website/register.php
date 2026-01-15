@@ -1,15 +1,8 @@
 <?php
-/**
- * რეგისტრაციის გვერდი
- * 
- * აქ ახალი მომხმარებლები რეგისტრირდებიან
- */
 
-// ვაერთიანებთ საჭირო ფაილებს
 require_once 'config/database.php';
 require_once 'includes/functions.php';
 
-// თუ უკვე შესულია - გადავიდეს მთავარ გვერდზე
 if (is_logged_in()) {
     redirect('index.php');
 }
@@ -17,47 +10,38 @@ if (is_logged_in()) {
 $page_title = 'რეგისტრაცია';
 $errors = [];
 
-// თუ ფორმა გაიგზავნა
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
-    // ველების მნიშვნელობების აღება
     $username = clean($_POST['username']);
     $email = clean($_POST['email']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
     
-    // ვალიდაცია (შემოწმება)
     
-    // 1. სახელის შემოწმება
     if (empty($username)) {
         $errors[] = 'მომხმარებლის სახელი აუცილებელია';
     } elseif (strlen($username) < 3) {
         $errors[] = 'მომხმარებლის სახელი უნდა იყოს მინიმუმ 3 სიმბოლო';
     }
     
-    // 2. ელ-ფოსტის შემოწმება
     if (empty($email)) {
         $errors[] = 'ელ-ფოსტა აუცილებელია';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = 'ელ-ფოსტის ფორმატი არასწორია';
     }
     
-    // 3. პაროლის შემოწმება
     if (empty($password)) {
         $errors[] = 'პაროლი აუცილებელია';
     } elseif (strlen($password) < 6) {
         $errors[] = 'პაროლი უნდა იყოს მინიმუმ 6 სიმბოლო';
     }
     
-    // 4. პაროლების შესაბამისობა
     if ($password !== $confirm_password) {
         $errors[] = 'პაროლები არ ემთხვევა';
     }
     
-    // თუ შეცდომები არ არის
     if (empty($errors)) {
         
-        // შევამოწმოთ უნიკალურია თუ არა username და email
         $check_sql = "SELECT id FROM users WHERE username = ? OR email = ?";
         $stmt = mysqli_prepare($conn, $check_sql);
         mysqli_stmt_bind_param($stmt, "ss", $username, $email);
@@ -67,16 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (mysqli_stmt_num_rows($stmt) > 0) {
             $errors[] = 'ეს მომხმარებელი ან ელ-ფოსტა უკვე არსებობს';
         } else {
-            // პაროლის დაშიფვრა
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             
-            // ჩასმა მონაცემთა ბაზაში
             $insert_sql = "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, 'user')";
             $stmt = mysqli_prepare($conn, $insert_sql);
             mysqli_stmt_bind_param($stmt, "sss", $username, $email, $hashed_password);
             
             if (mysqli_stmt_execute($stmt)) {
-                // წარმატება!
                 show_message('რეგისტრაცია წარმატებით დასრულდა! შეგიძლიათ შეხვიდეთ', 'success');
                 redirect('login.php');
             } else {
@@ -110,7 +91,6 @@ include 'includes/header.php';
         
         <form method="POST" action="">
             
-            <!-- მომხმარებლის სახელი -->
             <div class="form-group">
                 <label for="username">მომხმარებლის სახელი *</label>
                 <input 
@@ -123,7 +103,6 @@ include 'includes/header.php';
                 >
             </div>
             
-            <!-- ელ-ფოსტა -->
             <div class="form-group">
                 <label for="email">ელ-ფოსტა *</label>
                 <input 
@@ -136,7 +115,6 @@ include 'includes/header.php';
                 >
             </div>
             
-            <!-- პაროლი -->
             <div class="form-group">
                 <label for="password">პაროლი * (მინიმუმ 6 სიმბოლო)</label>
                 <input 
@@ -148,7 +126,6 @@ include 'includes/header.php';
                 >
             </div>
             
-            <!-- პაროლის დადასტურება -->
             <div class="form-group">
                 <label for="confirm_password">გაიმეორეთ პაროლი *</label>
                 <input 
@@ -160,7 +137,6 @@ include 'includes/header.php';
                 >
             </div>
             
-            <!-- ღილაკი -->
             <button type="submit" class="btn-primary" style="width: 100%;">
                 რეგისტრაცია
             </button>

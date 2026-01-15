@@ -1,16 +1,10 @@
 <?php
-/**
- * ძებნის გვერდი
- * 
- * გაფართოებული ძებნა ყველა ველის მიხედვით
- */
 
 require_once 'config/database.php';
 require_once 'includes/functions.php';
 
 $page_title = 'ძებნა';
 
-// ძებნის პარამეტრები
 $search = isset($_GET['q']) ? clean($_GET['q']) : '';
 $results = [];
 $search_performed = false;
@@ -19,7 +13,6 @@ if (!empty($search) && strlen($search) >= 2) {
     $search_performed = true;
     $search_safe = mysqli_real_escape_string($conn, $search);
     
-    // ვეძებთ ვარჯიშებში
     $workouts_sql = "
         SELECT 'workout' as type, w.id, w.title as name, w.description, c.name as category,
                w.image as image_path
@@ -30,7 +23,6 @@ if (!empty($search) && strlen($search) >= 2) {
         LIMIT 10
     ";
     
-    // ვეძებთ კატეგორიებში
     $categories_sql = "
         SELECT 'category' as type, id, name, description, icon as image_path
         FROM categories
@@ -39,7 +31,6 @@ if (!empty($search) && strlen($search) >= 2) {
         LIMIT 5
     ";
     
-    // ვეძებთ ინსტრუქტორებში
     $instructors_sql = "
         SELECT 'instructor' as type, id, name, bio as description, 
                specialization as category, photo as image_path
@@ -50,7 +41,6 @@ if (!empty($search) && strlen($search) >= 2) {
         LIMIT 5
     ";
     
-    // ვაერთიანებთ ყველა შედეგს
     $union_sql = "($workouts_sql) UNION ($categories_sql) UNION ($instructors_sql)";
     $results_query = mysqli_query($conn, $union_sql);
     
@@ -69,7 +59,6 @@ include 'includes/header.php';
         იპოვე ვარჯიშები, კატეგორიები და ინსტრუქტორები
     </p>
     
-    <!-- ძებნის ფორმა -->
     <div class="search-form-container card">
         <form method="GET" action="search.php" class="search-form">
             <div class="search-input-wrapper">
@@ -92,7 +81,6 @@ include 'includes/header.php';
             </p>
         </form>
         
-        <!-- სწრაფი ბმულები -->
         <div class="quick-links">
             <p style="font-weight: 600; margin-bottom: 0.5rem;">პოპულარული ძებნები:</p>
             <div class="quick-links-buttons">
@@ -105,7 +93,6 @@ include 'includes/header.php';
         </div>
     </div>
     
-    <!-- შედეგები -->
     <?php if ($search_performed): ?>
         <div class="search-results">
             <h2>
@@ -118,14 +105,12 @@ include 'includes/header.php';
             <?php if (count($results) > 0): ?>
                 <div class="results-list">
                     <?php 
-                    // ჯგუფურად გავაჩინოთ ტიპის მიხედვით
                     $grouped = [];
                     foreach ($results as $result) {
                         $grouped[$result['type']][] = $result;
                     }
                     ?>
                     
-                    <!-- ვარჯიშები -->
                     <?php if (isset($grouped['workout'])): ?>
                         <div class="result-group">
                             <h3>💪 ვარჯიშები</h3>
@@ -160,7 +145,6 @@ include 'includes/header.php';
                         </div>
                     <?php endif; ?>
                     
-                    <!-- კატეგორიები -->
                     <?php if (isset($grouped['category'])): ?>
                         <div class="result-group">
                             <h3>📁 კატეგორიები</h3>
@@ -192,7 +176,6 @@ include 'includes/header.php';
                         </div>
                     <?php endif; ?>
                     
-                    <!-- ინსტრუქტორები -->
                     <?php if (isset($grouped['instructor'])): ?>
                         <div class="result-group">
                             <h3>👨‍🏫 ინსტრუქტორები</h3>
@@ -242,7 +225,6 @@ include 'includes/header.php';
             <?php endif; ?>
         </div>
     <?php else: ?>
-        <!-- როცა ძებნა არ არის შესრულებული -->
         <div class="search-tips card">
             <h3>💡 ძებნის რჩევები</h3>
             <ul style="line-height: 2;">

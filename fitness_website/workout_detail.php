@@ -1,18 +1,9 @@
 <?php
-/**
- * ვარჯიშის დეტალური გვერდი
- * 
- * აქ ნაჩვენებია:
- * - ვარჯიშის სრული ინფორმაცია
- * - სავარჯიშოები (exercises)
- * - შეფასებები და კომენტარები
- * - პროგრესის მარკირება
- */
+
 
 require_once 'config/database.php';
 require_once 'includes/functions.php';
 
-// ვიღებთ ვარჯიშის ID-ს
 $workout_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 if ($workout_id <= 0) {
@@ -20,7 +11,6 @@ if ($workout_id <= 0) {
     redirect('workouts.php');
 }
 
-// ვარჯიშის ინფორმაცია
 $workout_sql = "
     SELECT w.*, c.name as category_name, i.name as instructor_name, i.bio as instructor_bio,
            COALESCE(AVG(r.rating), 0) as avg_rating,
@@ -42,11 +32,9 @@ if (mysqli_num_rows($workout_result) == 0) {
 $workout = mysqli_fetch_assoc($workout_result);
 $page_title = $workout['title'];
 
-// სავარჯიშოების მიღება
 $exercises_sql = "SELECT * FROM exercises WHERE workout_id = $workout_id ORDER BY order_number ASC";
 $exercises_result = mysqli_query($conn, $exercises_sql);
 
-// შეფასებების მიღება
 $reviews_sql = "
     SELECT r.*, u.username 
     FROM reviews r
@@ -57,7 +45,6 @@ $reviews_sql = "
 ";
 $reviews_result = mysqli_query($conn, $reviews_sql);
 
-// თუ მომხმარებელი შესულია - შევამოწმოთ გაიარა თუ არა
 $user_completed = false;
 if (is_logged_in()) {
     $user_id = $_SESSION['user_id'];
@@ -66,7 +53,6 @@ if (is_logged_in()) {
     $user_completed = mysqli_num_rows($check_result) > 0;
 }
 
-// პროგრესის მარკირება
 if (isset($_POST['mark_complete']) && is_logged_in()) {
     $user_id = $_SESSION['user_id'];
     $notes = clean($_POST['notes'] ?? '');
@@ -85,14 +71,12 @@ if (isset($_POST['mark_complete']) && is_logged_in()) {
     }
 }
 
-// შეფასების დამატება
 if (isset($_POST['add_review']) && is_logged_in()) {
     $user_id = $_SESSION['user_id'];
     $rating = (int)$_POST['rating'];
     $comment = clean($_POST['comment']);
     
     if ($rating >= 1 && $rating <= 5) {
-        // შევამოწმოთ უკვე შეაფასა თუ არა
         $check_review_sql = "SELECT id FROM reviews WHERE user_id = $user_id AND workout_id = $workout_id";
         $check_review = mysqli_query($conn, $check_review_sql);
         
@@ -116,7 +100,6 @@ if (isset($_POST['add_review']) && is_logged_in()) {
 include 'includes/header.php';
 ?>
 
-<!-- ვარჯიშის Header -->
 <div class="workout-header">
     <div class="workout-header-content">
         <div class="workout-header-info">
@@ -158,10 +141,8 @@ include 'includes/header.php';
     </div>
 </div>
 
-<!-- მთავარი კონტენტი -->
 <div class="workout-content">
     
-    <!-- აღწერა -->
     <section class="card">
         <h2>აღწერა</h2>
         <p style="line-height: 1.8; color: #4B5563;">
@@ -169,7 +150,6 @@ include 'includes/header.php';
         </p>
     </section>
     
-    <!-- სავარჯიშოები -->
     <section class="card">
         <h2>სავარჯიშოები</h2>
         
@@ -209,7 +189,6 @@ include 'includes/header.php';
         <?php endif; ?>
     </section>
     
-    <!-- პროგრესის მარკირება -->
     <?php if (is_logged_in()): ?>
         <section class="card">
             <h2>ჩემი პროგრესი</h2>
@@ -233,11 +212,9 @@ include 'includes/header.php';
         </section>
     <?php endif; ?>
     
-    <!-- შეფასებები -->
     <section class="card">
         <h2>შეფასებები და კომენტარები</h2>
         
-        <!-- შეფასების ფორმა -->
         <?php if (is_logged_in()): ?>
             <div class="review-form">
                 <h3>დატოვეთ თქვენი შეფასება</h3>
@@ -270,7 +247,6 @@ include 'includes/header.php';
             </div>
         <?php endif; ?>
         
-        <!-- არსებული შეფასებები -->
         <?php if (mysqli_num_rows($reviews_result) > 0): ?>
             <div class="reviews-list">
                 <?php while ($review = mysqli_fetch_assoc($reviews_result)): ?>
@@ -300,7 +276,6 @@ include 'includes/header.php';
 </div>
 
 <style>
-    /* Header */
     .workout-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
@@ -334,7 +309,6 @@ include 'includes/header.php';
         box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
     
-    /* სავარჯიშოები */
     .exercises-list {
         display: flex;
         flex-direction: column;
@@ -380,7 +354,6 @@ include 'includes/header.php';
         color: #4B5563;
     }
     
-    /* შეფასებები */
     .review-form {
         background: #F9FAFB;
         padding: 1.5rem;

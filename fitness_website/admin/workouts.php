@@ -1,9 +1,5 @@
 <?php
-/**
- * ადმინ პანელი - ვარჯიშების მართვა
- * 
- * CRUD: Create, Read, Update, Delete
- */
+
 
 require_once '../config/database.php';
 require_once '../includes/functions.php';
@@ -12,11 +8,9 @@ require_admin();
 
 $page_title = 'ვარჯიშების მართვა';
 
-// წაშლა
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     
-    // სურათის წაშლა
     $img_sql = "SELECT image FROM workouts WHERE id = $id";
     $img_result = mysqli_query($conn, $img_sql);
     $img_row = mysqli_fetch_assoc($img_result);
@@ -32,7 +26,6 @@ if (isset($_GET['delete'])) {
     redirect('workouts.php');
 }
 
-// დამატება/რედაქტირება
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
     $title = clean($_POST['title']);
@@ -44,7 +37,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     $image_name = '';
     
-    // ფაილის ატვირთვა
     if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
         $upload = upload_file($_FILES['image'], '../uploads/workouts');
         if ($upload['success']) {
@@ -53,7 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     if ($id > 0) {
-        // რედაქტირება
         $update_sql = "UPDATE workouts SET title = ?, description = ?, difficulty_level = ?, 
                        duration = ?, category_id = ?, instructor_id = ?";
         
@@ -79,7 +70,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_close($stmt);
         
     } else {
-        // დამატება
         $insert_sql = "INSERT INTO workouts (title, description, difficulty_level, duration, 
                        category_id, instructor_id, image) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = mysqli_prepare($conn, $insert_sql);
@@ -95,7 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     redirect('workouts.php');
 }
 
-// რედაქტირებისთვის მონაცემების მიღება
 $edit_workout = null;
 if (isset($_GET['edit'])) {
     $edit_id = (int)$_GET['edit'];
@@ -104,7 +93,6 @@ if (isset($_GET['edit'])) {
     $edit_workout = mysqli_fetch_assoc($edit_result);
 }
 
-// ყველა ვარჯიშის ჩამოტვირთვა
 $workouts_sql = "
     SELECT w.*, c.name as category_name, i.name as instructor_name
     FROM workouts w
@@ -114,7 +102,6 @@ $workouts_sql = "
 ";
 $workouts_result = mysqli_query($conn, $workouts_sql);
 
-// კატეგორიები და ინსტრუქტორები (dropdown-ებისთვის)
 $categories_result = mysqli_query($conn, "SELECT * FROM categories ORDER BY name");
 $instructors_result = mysqli_query($conn, "SELECT * FROM instructors ORDER BY name");
 
@@ -128,7 +115,6 @@ include 'admin_header.php';
         <a href="index.php" class="btn-secondary">← დაბრუნება</a>
     </div>
     
-    <!-- დამატების/რედაქტირების ფორმა -->
     <div class="card">
         <h2><?php echo $edit_workout ? 'ვარჯიშის რედაქტირება' : 'ახალი ვარჯიშის დამატება'; ?></h2>
         
@@ -220,7 +206,6 @@ include 'admin_header.php';
         </form>
     </div>
     
-    <!-- ვარჯიშების სია -->
     <div class="card">
         <h2>ყველა ვარჯიში (<?php echo mysqli_num_rows($workouts_result); ?>)</h2>
         
